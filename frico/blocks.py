@@ -167,7 +167,7 @@ class RegisterBlock(Generic[BlockType], ABC):
         self.pending_state[address] = value
 
 
-class TimekeepingRegisterBlock(RegisterBlock[datetime]):
+class DatetimeRegisterBlock(RegisterBlock[datetime]):
     """
     Base class whose subclasses keep track of the register addresses where
     various components of the date/time/alarms are stored for RTC ICs such

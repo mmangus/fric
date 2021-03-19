@@ -64,7 +64,7 @@ register is the 10s place and the second nibble is the 1s place, like this:
 |=======================================================================|
 ```
 
-Frico includes an abstract TimkeepingRegisterBlock which lets you translate
+Frico includes an abstract DatetimeRegisterBlock which lets you translate
 datetime objects to/from the device's registers with minimal effort. Subclasses
 of TimekeepingRegisterBlock define attributes of type `RegisterParser[int]` to
 map components of a datetime object to the values of specific register 
@@ -72,27 +72,28 @@ addresses. In this example, we can use the built-in BCDParser for everything.
 
 ```python
 from datetime import datetime
-from frico.blocks import TimekeepingRegisterBlock
+from frico.blocks import DatetimeRegisterBlock
 from frico.devices import I2CDevice
 from frico.parsers import BCDParser
 
+
 # frico provides a TimekeepingRegisterBlock which reads and writes datetime, 
 # with attributes to represent the individual time components
-class Time(TimekeepingRegisterBlock):
+class Time(DatetimeRegisterBlock):
     second = BCDParser(0x00)
     minute = BCDParser(0x01)
     hour = BCDParser(0x02)
     day_of_month = BCDParser(0x03)
     month = BCDParser(0x04)
     year = BCDParser(0x05)
-    
+
 
 class RTC(I2CDevice):
     I2C_ADDRESS = 0x68  # the I2C device address
     I2C_READ_LEN = 0x06  # number of bytes readable from the device
     time = Time()
 
-    
+
 rtc = RTC()  # sets up I2C communication via SMBus
 rtc.time = datetime.now()  # sets the clock registers from a datetime
 print(rtc.time)  # accesses the clock registers and prints a datetime
