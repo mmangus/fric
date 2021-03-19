@@ -106,7 +106,16 @@ class BCDParser(RegisterParser[int]):
 
 
 class FlagParser(RegisterParser[bool]):
+    """
+    Base class for flags stored as a single bit in a register.
+    """
     def __init__(self, address: int, bit: int) -> None:
+        # FIXME better as extra arg to constructor or class-level attribute?
+        #  for BCDParser, its nice to have subclasses define their bounds
+        #  in a way that can be reused across multiple registers. i'm not sure
+        #  there is an equivalent use case for FlagParser, but there could
+        #  be. it feels weird for them to implement very similar functionality
+        #  in 2 different ways.
         self._bit = bit
         super().__init__(address)
 

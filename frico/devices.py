@@ -22,6 +22,12 @@ class I2CDevice(ABC):
     def I2C_READ_LEN(self) -> int:
         """Default number of bytes to read via I2C"""
 
+    @property
+    @abstractmethod
+    def I2C_READ_START(self) -> int:
+        """Register address to begin read (default 0x00)"""
+        return 0x00
+
     def __init__(self, i2c_bus_id: Union[int, str]=1, ) -> None:
         """
         Set up I2C communication for the device.
@@ -44,7 +50,7 @@ class I2CDevice(ABC):
         try:
             data = self.bus.read_i2c_block_data(
                     self.I2C_ADDRESS,
-                    0x00,  # start at the first register
+                    self.I2C_READ_START,
                     self.I2C_READ_LEN,
             )
         except Exception as err:  # FIXME what are the possible errors?

@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from typing import Generic, Type, TypeVar, Union
 
 from frico.devices import I2CDevice
 from frico.typing import RegisterState
+from frico.parsers import RegisterParser
 
 
 BlockType = TypeVar('BlockType')
@@ -54,7 +56,7 @@ class RegisterBlock(Generic[BlockType], ABC):
     @register_state.setter
     def register_state(self, state: 'RegisterState') -> None:
         """
-        Keeps a copy to use as _pending_state for writes whenever updated.
+        Setting register_state also keeps a copy to use as pending_state.
         """
         self._register_state = state
         self.pending_state = self._register_state.copy()
@@ -149,9 +151,82 @@ class RegisterBlock(Generic[BlockType], ABC):
         same register. Once all parsers have staged their changes (implement
         via _prepare_update), the __set__ method will write all the changes to
         the parent I2CDevice instance.
+
+        Parameters
+        ----------
+        address : Union[int, slice]
+            The register address(es) to set
+
+        value : RegisterState
+            The bytes to insert at address
         """
         if isinstance(address, int):
             address = slice(address, address + 1)
         if len(value) != len(self.pending_state[address]):
             raise ValueError("Value must have as many bytes as slice")
         self.pending_state[address] = value
+
+
+class TimekeepingRegisterBlock(RegisterBlock[datetime]):
+    """
+    Base class whose subclasses keep track of the register addresses where
+    various components of the date/time/alarms are stored for RTC ICs such
+    as the Maxim DS series.
+    """
+    hour: RegisterParser[int]
+    minute: RegisterParser[int]
+    day_of_month: RegisterParser[int]
+
+    # Define defaults for attributes that may be left unset, e.g. the DS3231
+    # and DS1337 have no seconds for Alarm 2, and no year or month for either
+    # Alarm.
+    @property
+    def second(self) -> Union[RegisterParser[int], int]:
+        return 0
+
+    @second.setter
+    def second(self, value: int) -> None:
+        pass
+
+    @property
+    def month(self) -> Union[RegisterParser[int], int]:
+        return datetime.now().month
+
+    @month.setter
+    def month(self, value: int) -> None:
+        pass
+
+    @property
+    def year(self) -> Union[RegisterParser[int], int]:
+        return datetime.now().year
+
+    @year.setter
+    def year(self, value: int) -> None:
+        pass
+
+    def _prepare_update(self, value: datetime) -> None:
+        # FIXME pycharm doesn't understand you can assign an int to the
+        #  parser descriptors, but mypy does
+        self.second = value.second
+        self.minute = value.minute
+        self.hour = value.hour
+        self.day_of_month = value.day
+        self.month = value.month
+        self.year = value.year
+
+    def _value(self) -> datetime:
+        try:
+            value = datetime(
+                self.year,
+                self.month,
+                self.day_of_month,
+                self.hour,
+                self.minute,
+                self.second
+            )
+        except ValueError as err:
+            raise ValueError(
+                "Could not parse datetime. Perhaps the register state is"
+                "invalid? Try setting to a known valid state first."
+            ) from err
+        return value
