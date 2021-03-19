@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Any, Generic, Tuple, Type, TYPE_CHECKING, TypeVar, Union
 
-from frico.bitstring import BitString
-from frico.typing import RegisterState
+from .bitstring import BitString
+from .typing import RegisterState
 
 if TYPE_CHECKING:
-    from frico.blocks import RegisterBlock
+    from .blocks import RegisterBlock
 
 
 ParserType = TypeVar('ParserType')

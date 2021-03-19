@@ -11,7 +11,7 @@ device class with the framework managing IO.
 
 Frico is published on PyPI and is simple to install via pip, for example:
 
-```python -m pip install frico```
+```python3 -m pip install frico```
 
 Frico only supports Python 3 and includes type annotations.
 
@@ -76,9 +76,6 @@ from frico.blocks import DatetimeRegisterBlock
 from frico.devices import I2CDevice
 from frico.parsers import BCDParser
 
-
-# frico provides a TimekeepingRegisterBlock which reads and writes datetime, 
-# with attributes to represent the individual time components
 class Time(DatetimeRegisterBlock):
     second = BCDParser(0x00)
     minute = BCDParser(0x01)

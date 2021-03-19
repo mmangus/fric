@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Generic, Type, TypeVar, Union
 
-from frico.devices import I2CDevice
-from frico.typing import RegisterState
-from frico.parsers import RegisterParser
+from .devices import I2CDevice
+from .typing import RegisterState
+from .parsers import RegisterParser
 
 
 BlockType = TypeVar('BlockType')

@@ -3,8 +3,8 @@ from typing import Union
 
 from smbus2 import smbus2
 
-from frico.bitstring import BitString
-from frico.typing import RegisterState
+from .bitstring import BitString
+from .typing import RegisterState
 
 
 class I2CError(OSError):
