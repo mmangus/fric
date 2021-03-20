@@ -66,7 +66,7 @@ register is the 10s place and the second nibble is the 1s place, like this:
 
 Frico includes an abstract DatetimeRegisterBlock which lets you translate
 datetime objects to/from the device's registers with minimal effort. Subclasses
-of TimekeepingRegisterBlock define attributes of type `RegisterParser[int]` to
+of DatetimeRegisterBlock define attributes of type `RegisterParser[int]` to
 map components of a datetime object to the values of specific register 
 addresses. In this example, we can use the built-in BCDParser for everything.
 
