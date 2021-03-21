@@ -3,11 +3,12 @@ from datetime import datetime
 from typing import Generic, Type, TypeVar, Union
 
 from .devices import I2CDevice
-from .typing import RegisterState
 from .parsers import RegisterParser
+from .typing import RegisterState
+
+BlockType = TypeVar("BlockType")
 
 
-BlockType = TypeVar('BlockType')
 class RegisterBlock(Generic[BlockType], ABC):
     """
     Abstract base class for collections of registers that represent distinct
@@ -46,15 +47,16 @@ class RegisterBlock(Generic[BlockType], ABC):
             def _prepare_update(self, value: Tuple[int, int]) -> None:
                 self.integer_part, self.fractional_part = value
     """
+
     @property
-    def register_state(self) -> 'RegisterState':
+    def register_state(self) -> "RegisterState":
         """
         Accesses register state from the most recent read of the parent device.
         """
         return self._register_state
 
     @register_state.setter
-    def register_state(self, state: 'RegisterState') -> None:
+    def register_state(self, state: "RegisterState") -> None:
         """
         Setting register_state also keeps a copy to use as pending_state.
         """
@@ -71,9 +73,7 @@ class RegisterBlock(Generic[BlockType], ABC):
         self.register_state: RegisterState = []
 
     def __get__(
-            self,
-            instance: 'I2CDevice',
-            owner: Type['I2CDevice']
+        self, instance: "I2CDevice", owner: Type["I2CDevice"]
     ) -> BlockType:
         """
         RegisterBlock is a data descriptor with access to the state of the
@@ -98,11 +98,7 @@ class RegisterBlock(Generic[BlockType], ABC):
         self.register_state = instance.read_registers()
         return self._value()
 
-    def __set__(
-            self,
-            instance: 'I2CDevice',
-            value: BlockType
-    ) -> None:
+    def __set__(self, instance: "I2CDevice", value: BlockType) -> None:
         """
         Setting the value of the RegisterBlock updates its state via the
         RegisterParser descriptors that belong to the block.
@@ -114,12 +110,13 @@ class RegisterBlock(Generic[BlockType], ABC):
         # changed register to the last changed register, leaving the rest
         # unmodified. This helps improve the speed of small updates.
         addresses_changed = [
-            i for i, b in enumerate(self.pending_state)
+            i
+            for i, b in enumerate(self.pending_state)
             if b != self._register_state[i]
         ]
         first_changed = min(addresses_changed)
         last_changed = max(addresses_changed)
-        to_write = self.pending_state[first_changed:last_changed + 1]
+        to_write = self.pending_state[first_changed : last_changed + 1]
         instance.write_registers(to_write, first_changed)
 
     @abstractmethod
@@ -140,9 +137,7 @@ class RegisterBlock(Generic[BlockType], ABC):
         """
 
     def update_register_state(
-            self,
-            address: Union[int, slice],
-            value: 'RegisterState'
+        self, address: Union[int, slice], value: "RegisterState"
     ) -> None:
         """
         RegisterParsers should call this method to stage their changes to the
@@ -173,6 +168,7 @@ class DatetimeRegisterBlock(RegisterBlock[datetime]):
     various components of the date/time/alarms are stored for RTC ICs such
     as the Maxim DS series.
     """
+
     hour: RegisterParser[int]
     minute: RegisterParser[int]
     day_of_month: RegisterParser[int]
@@ -222,7 +218,7 @@ class DatetimeRegisterBlock(RegisterBlock[datetime]):
                 self.day_of_month,
                 self.hour,
                 self.minute,
-                self.second
+                self.second,
             )
         except ValueError as err:
             raise ValueError(

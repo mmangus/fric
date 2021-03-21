@@ -23,14 +23,15 @@ class BitString(int):
     >>> BitString('10100100').decode_bcd((1, 4), (4, 8))
     24
     """
+
     bitstring: str  # signal to mypy that this will be added by __new__
 
     def __new__(
-            cls,
-            value: Union[str, int],
-            fill: int=0,
-            raise_on_overflow: bool=False
-    ) -> 'BitString':
+        cls,
+        value: Union[str, int],
+        fill: int = 0,
+        raise_on_overflow: bool = False,
+    ) -> "BitString":
         """
         Accepts a positive integer or string representation of a binary
         unsigned integer. Stores the binary string representation.
@@ -51,7 +52,7 @@ class BitString(int):
         if isinstance(value, str):
             # make the fill value at least as long as the input
             fill = max(len(value), fill)
-            value = int(value.replace(' ', ''), 2)
+            value = int(value.replace(" ", ""), 2)
         if value < 0:
             raise ValueError("BitString does not support negative values")
         instance = super().__new__(cls, value)
@@ -61,7 +62,7 @@ class BitString(int):
             raise ValueError(f"Value {value} too large for {fill} bits")
         return instance
 
-    def __getitem__(self, key: Union[int, slice]) -> 'BitString':
+    def __getitem__(self, key: Union[int, slice]) -> "BitString":
         """
         Slice the string representation
 
@@ -71,7 +72,7 @@ class BitString(int):
         slice_ = self.bitstring[key]
         return BitString(slice_, fill=len(slice_))
 
-    def replace(self, offset: int, value: 'BitString') -> 'BitString':
+    def replace(self, offset: int, value: "BitString") -> "BitString":
         """
         Return a new BitString where `len(value)` bits starting at `offset`
         are replaced by `value`.
@@ -85,11 +86,11 @@ class BitString(int):
             raise ValueError("Value too large for requested offset")
         bit_list = list(self.bitstring)
         to_insert = str(value)
-        bit_list[offset:offset + len(to_insert)] = to_insert
-        return BitString(''.join(bit_list))
+        bit_list[offset : offset + len(to_insert)] = to_insert
+        return BitString("".join(bit_list))
 
     @classmethod
-    def concat(cls, *bitstrings: 'BitString') -> 'BitString':
+    def concat(cls, *bitstrings: "BitString") -> "BitString":
         """
         Concatenate two or more BitStrings together as strings to produce a new
         BitString
@@ -103,10 +104,10 @@ class BitString(int):
         """
         if any(b for b in bitstrings if not isinstance(b, BitString)):
             raise TypeError("BitString.concat only operates on BitStrings")
-        concatenated_string = ''.join(map(str, bitstrings))
+        concatenated_string = "".join(map(str, bitstrings))
         return BitString(concatenated_string, fill=len(concatenated_string))
 
-    def join(self, *others: 'BitString') -> 'BitString':
+    def join(self, *others: "BitString") -> "BitString":
         """
         Join the string representation of other BitStrings onto this one.
 
@@ -144,7 +145,9 @@ class BitString(int):
         return sum(10 ** i * d for i, d in enumerate(digits[::-1]))
 
     @classmethod
-    def encode_bcd(cls, value: int, sizes: Collection[int]=(4, 4)) -> 'BitString':
+    def encode_bcd(
+        cls, value: int, sizes: Collection[int] = (4, 4)
+    ) -> "BitString":
         """
         Given a decimal value and a tuple of sizes (number of bits) for each
         digit, return a BitString with BCD encoding of that value. Defaults to

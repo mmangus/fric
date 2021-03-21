@@ -47,13 +47,14 @@ RegisterParsers to access specific addresses in the device registers and
 manipulate their values. 
  
 Suppose you have a very simple real-time clock that keeps the current time
-using 6 registers: second, minute, hour, day, month, and year (00-99), all
-encoded as binary-coded decimal (BCD) - the first nibble of 4 bits in each 
-register is the 10s place and the second nibble is the 1s place, like this:
+using 6 8-bit registers: second, minute, hour, day, month, and year (00-99), 
+all encoded as binary-coded decimal (BCD) - the first nibble of 4 bits in 
+each register is the 10s place and the second nibble is the 1s place, like 
+this:
 
 ```text
 |=======================================================================|
-| Addr. | Bit 0 | Bit 1 | Bit 2 | Bit 3 | Bit 4 | Bit 5 | Bit 6 | Bit 7 |
+| Addr. | Bit 7 | Bit 6 | Bit 5 | Bit 4 | Bit 3 | Bit 2 | Bit 1 | Bit 0 |
 |-------|-------------------------------|-------------------------------|
 | 0x00  |      Seconds - tens           |         Seconds - ones        |
 | 0x01  |      Minutes - tens           |         Minutes - ones        |
@@ -68,13 +69,26 @@ Frico includes an abstract DatetimeRegisterBlock which lets you translate
 datetime objects to/from the device's registers with minimal effort. Subclasses
 of DatetimeRegisterBlock define attributes of type `RegisterParser[int]` to
 map components of a datetime object to the values of specific register 
-addresses. In this example, we can use the built-in BCDParser for everything.
+addresses. In this example, we can use the built-in BCDParser for almost
+every register. The only exception is the year, which should have 2000 added 
+to its value on read and subtracted from a given value on write.
 
 ```python
 from datetime import datetime
 from frico.blocks import DatetimeRegisterBlock
 from frico.devices import I2CDevice
 from frico.parsers import BCDParser
+from frico.typing import RegisterState
+
+
+class YearParser(BCDParser):
+    def _value(self) -> int:
+        return super()._value() + 2000
+    
+    def _prepare_update(self, value: int) -> RegisterState:
+        value -= 2000
+        return super()._prepare_update(value)
+    
 
 class Time(DatetimeRegisterBlock):
     second = BCDParser(0x00)
@@ -82,7 +96,7 @@ class Time(DatetimeRegisterBlock):
     hour = BCDParser(0x02)
     day_of_month = BCDParser(0x03)
     month = BCDParser(0x04)
-    year = BCDParser(0x05)
+    year = YearParser(0x05)
 
 
 class RTC(I2CDevice):
@@ -92,6 +106,6 @@ class RTC(I2CDevice):
 
 
 rtc = RTC()  # sets up I2C communication via SMBus
-rtc.time = datetime.now()  # sets the clock registers from a datetime
 print(rtc.time)  # accesses the clock registers and prints a datetime
+rtc.time = datetime.now()  # set the clock registers from a datetime
 ```

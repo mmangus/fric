@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Generic, Tuple, Type, TYPE_CHECKING, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Generic, Tuple, Type, TypeVar, Union
 
 from .bitstring import BitString
 from .typing import RegisterState
@@ -8,12 +8,15 @@ if TYPE_CHECKING:
     from .blocks import RegisterBlock
 
 
-ParserType = TypeVar('ParserType')
+ParserType = TypeVar("ParserType")
+
+
 class RegisterParser(ABC, Generic[ParserType]):
     """
     Abstract base class for data descriptors that parse/set register values.
     Subclasses represent the various formats of registers used by a Device.
     """
+
     def __init__(self, address: Union[int, slice]):
         """
         Initialize a parser instance for the given register address(es).
@@ -31,12 +34,12 @@ class RegisterParser(ABC, Generic[ParserType]):
         #  cause weird behavior; store state in a dict keyed by instance?
         #  or use a meta-class to define a label?
         #  https://nbviewer.jupyter.org/urls/gist.github.com/ChrisBeaumont/5758381/raw/descriptor_writeup.ipynb#Make-sure-to-keep-instance-level-data-instance-specific
-        self._register_state = []
+        self._register_state: RegisterState = []
 
     def __get__(
-            self,
-            instance: 'RegisterBlock[Any]',
-            owner: Type['RegisterBlock[Any]'],
+        self,
+        instance: "RegisterBlock[Any]",
+        owner: Type["RegisterBlock[Any]"],
     ) -> ParserType:
         """
         When accessing a RegisterParser, set its register state based on the
@@ -48,9 +51,7 @@ class RegisterParser(ABC, Generic[ParserType]):
         return self._value()
 
     def __set__(
-            self,
-            instance: 'RegisterBlock[Any]',
-            value: ParserType
+        self, instance: "RegisterBlock[Any]", value: ParserType
     ) -> None:
         """
         When setting a RegisterParser value, make sure its state is in sync
@@ -92,6 +93,7 @@ class BCDParser(RegisterParser[int]):
     tuple representing the bits to slice for each digit). By default, parses
     2 decimal digits from the 4-bit nibbles of a byte.
     """
+
     bcd_bounds: Tuple[Tuple[int, int], ...] = ((0, 4), (4, 8))
 
     def _value(self) -> int:
@@ -109,6 +111,7 @@ class FlagParser(RegisterParser[bool]):
     """
     Base class for flags stored as a single bit in a register.
     """
+
     def __init__(self, address: int, bit: int) -> None:
         # FIXME better as extra arg to constructor or class-level attribute?
         #  for BCDParser, its nice to have subclasses define their bounds
@@ -123,5 +126,7 @@ class FlagParser(RegisterParser[bool]):
         return bool(self._local_bytes[0][self._bit])
 
     def _prepare_update(self, value: bool) -> RegisterState:
-        new_state = [self._local_bytes[0].replace(self._bit, BitString(int(value)))]
+        new_state = [
+            self._local_bytes[0].replace(self._bit, BitString(int(value)))
+        ]
         return new_state
