@@ -11,9 +11,19 @@ device class with the framework managing IO.
 
 Frico is published on PyPI and is simple to install via pip, for example:
 
-```python3 -m pip install frico```
+```shell
+python3 -m pip install frico
+```
 
 Frico only supports Python 3 and includes type annotations.
+
+If you want to contribute to Frico, you can set up a development environment
+using the provided Makefile:
+```shell
+git clone git@github.com:mmangus/frico.git
+cd frico
+make
+```
 
 ## Getting started
 

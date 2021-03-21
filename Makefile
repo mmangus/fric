@@ -19,6 +19,8 @@ lint=.venv/.lint
 formatcheck=.venv/.format-check
 typecheck=.venv/.typecheck
 unit=.venv/.unit
+test=.venv/.test
+testci=.venv/.testci
 
 all: $(install)
 
@@ -55,10 +57,6 @@ $(install): requirements.txt
 	@.venv/bin/python3 -m pip install -r requirements.txt
 	@touch $(install)
 	$(STEP_BOTTOM)
-
-.PHONY: clean
-clean:
-	@rm -rf .venv
 
 $(format): $(install)  $(shell find -name *.py)
 	$(STEP_TOP)
@@ -110,10 +108,39 @@ $(unit): $(install) $(shell find -name *.py)
 success:
 	$(SUCCESS)
 
-.venv/.test: $(format) $(lint) $(typecheck) $(unit) success
-	@touch .venv/.test
-test: .venv/.test
+$(test): $(format) $(lint) $(typecheck) $(unit) success
+	@touch $(test)
 
-.venv/.test-ci: $(formatcheck) $(lint) $(typecheck) $(unit) success
-	@touch .venv/.test-ci
-test-ci: .venv/.test-ci
+test: $(test)
+
+$(testci): $(formatcheck) $(lint) $(typecheck) $(unit)
+	@touch $(testci)
+
+test-ci: $(testci)
+
+build: $(testci)
+	$(STEP_TOP)
+	@echo "$(BLUE)┋ Building package...$(NOCOLOR)"
+	@.venv/bin/python3 -m build
+	$(STEP_BOTTOM)
+
+package: build/lib/frico
+
+.PHONY: publish
+publish: $(build)
+	@python3 -m twine upload
+
+.PHONY: clean
+clean:
+	$(STEP_TOP)
+	@echo "$(BLUE)┋ Starting fresh...$(NOCOLOR)"
+	@echo "Removing .venv..."
+	@rm -rf .venv
+	@echo "Removing packaging directories..."
+	@rm -rf build
+	@rm -rf dist
+	@rm -rf src/frico.egg-info
+	@echo "Removing test cache..."
+	@rm -rf .mypy_cache
+	@rm -rf .pytest_cache
+	$(STEP_BOTTOM)
