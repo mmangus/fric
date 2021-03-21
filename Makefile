@@ -125,7 +125,7 @@ dist: $(testci)
 	@.venv/bin/python3 -m build
 	$(STEP_BOTTOM)
 
-package: build/lib/frico
+package: dist
 
 $(publish): dist
 	$(STEP_TOP)
