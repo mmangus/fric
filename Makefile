@@ -21,6 +21,7 @@ typecheck=.venv/.typecheck
 unit=.venv/.unit
 test=.venv/.test
 testci=.venv/.testci
+publish=.venv/.publish
 
 all: $(install)
 
@@ -118,7 +119,7 @@ $(testci): $(formatcheck) $(lint) $(typecheck) $(unit)
 
 test-ci: $(testci)
 
-build: $(testci)
+dist: $(testci)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Building package...$(NOCOLOR)"
 	@.venv/bin/python3 -m build
@@ -126,9 +127,15 @@ build: $(testci)
 
 package: build/lib/frico
 
-.PHONY: publish
-publish: $(build)
-	@python3 -m twine upload
+$(publish): dist
+	$(STEP_TOP)
+	@git diff --exit-code || (echo "Commit all changes before publishing"; exit 1)
+	@echo "$(BLUE)┋ Publishing...$(NOCOLOR)"
+	@python3 -m twine upload dist/*
+	@touch $(publish)
+	$(STEP_BOTTOM)
+
+publish: $(publish)
 
 .PHONY: clean
 clean:
