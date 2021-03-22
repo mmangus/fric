@@ -20,10 +20,11 @@ Frico only supports Python 3 and includes type annotations.
 If you want to contribute to Frico, you can set up a development environment
 using the provided Makefile:
 ```shell
-git clone git@github.com:mmangus/frico.git
-cd frico
+git clone git@github.com:mmangus/frico.git &&\
+cd frico &&\
 make
 ```
+Use `make test` to test changes (runs automatically pre-commit).
 
 ## Getting started
 
