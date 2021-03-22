@@ -11,7 +11,7 @@ then
   then
     echo $BLUE"┏━┅┉\n┋ Changes to requirements.in but not requirements.txt! Recompiling...\n┗━┅┉"$NOCOLOR
     make requirements
-    echo $BLUE"┏━┅┉\n┋ Adding requirements.txt to commit...┗━┅┉"$NOCOLOR
+    echo $BLUE"┏━┅┉\n┋ Adding requirements.txt to commit...\n┗━┅┉"$NOCOLOR
     git add requirements.txt
   fi
 else
