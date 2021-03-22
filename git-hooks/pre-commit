@@ -13,7 +13,6 @@ then
     make requirements
     echo "Adding requirements.txt to commit"$NOCOLOR
     git add requirements.txt
-    echo "OK"
   fi
 else
   if ! git diff --cached  --quiet requirements.txt
