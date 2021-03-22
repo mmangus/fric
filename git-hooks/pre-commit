@@ -25,4 +25,4 @@ fi
 
 changes=$(git diff --cached --name-only)
 make test
-git add "$(echo "$changes" | paste -s -d " " -)"
+git add $(echo "$changes" | paste -s -d " " -)

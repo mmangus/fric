@@ -4,6 +4,8 @@
 #
 #    make requirements
 #
+-e file:.#egg=frico
+    # via -r requirements.in
 appdirs==1.4.4
     # via black
 attrs==20.3.0
@@ -29,8 +31,6 @@ cryptography==3.4.6
 docutils==0.16
     # via readme-renderer
 flake8==3.9.0
-    # via -r requirements.in
-file:.#egg=frico
     # via -r requirements.in
 idna==2.10
     # via requests
