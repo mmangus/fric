@@ -8,7 +8,7 @@ STEP_TOP := @echo "$(BLUE)$(FRAME_TOP)$(NOCOLOR)"
 STEP_BOTTOM := @echo "$(BLUE)$(FRAME_BOTTOM)$(NOCOLOR)"
 SUCCESS := @echo "$(GREEN)$(FRAME_TOP)\n┋ All tests complete: success! \n$(FRAME_BOTTOM)$(NOCOLOR)"
 
-# this project uses dependencies to skip redundant steps, but  make aliases
+# this project uses dependencies to skip redundant steps, but make aliases
 # don't work as expected when used as dependencies, so assign vars :|
 venv=.venv/bin/activate
 install=.venv/.install
@@ -52,7 +52,7 @@ requirements.txt: requirements.in $(piptools)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Compiling pinned dependencies...$(NOCOLOR)"
 	@CUSTOM_COMPILE_COMMAND="make requirements" .venv/bin/pip-compile requirements.in
-	@rm $(install)
+	@rm -f $(install)
 	$(STEP_BOTTOM)
 
 $(install): $(piptools)

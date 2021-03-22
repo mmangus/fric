@@ -1,24 +1,29 @@
 #!/bin/sh
-#
-# An example hook script to verify what is about to be committed.
-# Called by "git commit" with no arguments.  The hook should
-# exit with non-zero status after issuing an appropriate message if
-# it wants to stop the commit.
-#
-# To enable this hook, rename this file to "pre-commit".
+set -e
 
-if git rev-parse --verify HEAD >/dev/null 2>&1
+export RED='\033[1;31m'
+export BLUE='\033[1;34m'
+export NOCOLOR='\033[0m'
+
+if ! git diff --cached --quiet requirements.in
 then
-	against=HEAD
+  if git diff --cached --quiet requirements.txt
+  then
+    echo $BLUE"Changes to requirements.in but not requirements.txt!"
+    make requirements
+    echo "Adding requirements.txt to commit"$NOCOLOR
+    git add requirements.txt
+    echo "OK"
+  fi
 else
-	# Initial commit: diff against an empty tree object
-	against=$(git hash-object -t tree /dev/null)
+  if ! git diff --cached  --quiet requirements.txt
+  then
+    echo $RED"Changes to requirements.txt but not requirements.in!"
+    echo "Move your changes to requirements.in, then run 'make requirements'."$NOCOLOR
+    exit 1
+  fi
 fi
 
-# Redirect output to stderr.
-exec 1>&2
-
 changes=$(git diff --cached --name-only)
-set -e
 make test
 git add $(echo "$changes" | paste -s -d " " -)
