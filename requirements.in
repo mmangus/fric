@@ -1,6 +1,6 @@
 # Run `make requirements` to compile changes to requirements.txt
 
-file:.#egg=frico
+-e file:.#egg=frico
 black==20.8b1
 flake8==3.9.0
 isort==5.8.0
