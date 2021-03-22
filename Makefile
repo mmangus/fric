@@ -13,7 +13,7 @@ SUCCESS := @echo "$(GREEN)$(FRAME_TOP)\n┋ All tests complete: success! \n$(FRA
 venv=.venv/bin/activate
 install=.venv/.install
 hooks=.venv/.hooks
-pipcompile=.venv/bin/pip-compile
+piptools=.venv/bin/pip-compile
 format=.venv/.format
 lint=.venv/.lint
 formatcheck=.venv/.format-check
@@ -40,22 +40,25 @@ $(hooks): $(venv)
 	@touch $(hooks)
 	$(STEP_BOTTOM)
 
-$(pipcompile): $(hooks)
+$(piptools): $(hooks)  # not a real dep but easier to pretend it is
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Installing pip-tools...$(NOCOLOR)"
 	@.venv/bin/python3 -m pip install pip-tools
 	$(STEP_BOTTOM)
 
-requirements.txt: requirements.in $(pipcompile)
+requirements: requirements.txt $(install)
+
+requirements.txt: requirements.in $(piptools)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Compiling pinned dependencies...$(NOCOLOR)"
-	@CUSTOM_COMPILE_COMMAND="make requirements.txt" .venv/bin/pip-compile requirements.in
+	@CUSTOM_COMPILE_COMMAND="make requirements" .venv/bin/pip-compile requirements.in
+	@rm $(install)
 	$(STEP_BOTTOM)
 
-$(install): requirements.txt
+$(install): $(piptools)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Installing requirements...$(NOCOLOR)"
-	@.venv/bin/python3 -m pip install -r requirements.txt
+	@.venv/bin/pip-sync
 	@touch $(install)
 	$(STEP_BOTTOM)
 
