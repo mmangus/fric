@@ -49,7 +49,7 @@ $(pipcompile): $(hooks)
 requirements.txt: requirements.in $(pipcompile)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Compiling pinned dependencies...$(NOCOLOR)"
-	@CUSTOM_COMPILE_COMMAND="make" .venv/bin/pip-compile requirements.in
+	@CUSTOM_COMPILE_COMMAND="make requirements.txt" .venv/bin/pip-compile requirements.in
 	$(STEP_BOTTOM)
 
 $(install): requirements.txt
