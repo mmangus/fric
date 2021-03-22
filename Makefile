@@ -62,7 +62,7 @@ $(install): $(piptools)
 	@touch $(install)
 	$(STEP_BOTTOM)
 
-$(format): $(install)  $(shell find -name *.py)
+$(format): $(install) $(shell find -name *.py)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Formatting...$(NOCOLOR)"
 	@echo "isort `.venv/bin/isort --version-number)`"
