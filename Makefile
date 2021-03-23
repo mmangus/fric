@@ -62,7 +62,7 @@ $(install): $(piptools)
 	@touch $(install)
 	$(STEP_BOTTOM)
 
-$(format): $(install) $(shell find -name *.py)
+$(format): $(install) $(SOURCE_FILES)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Formatting...$(NOCOLOR)"
 	@echo "isort `.venv/bin/isort --version-number)`"
@@ -73,7 +73,7 @@ $(format): $(install) $(shell find -name *.py)
 	$(STEP_BOTTOM)
 
 # for CI use, bail out of anything needs to be reformatted
-$(formatcheck): $(install) $(shell find -name *.py)
+$(formatcheck): $(install) $(SOURCE_FILES)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Checking format...$(NOCOLOR)"
 	@echo "isort `.venv/bin/isort --version-number)`"
@@ -84,7 +84,7 @@ $(formatcheck): $(install) $(shell find -name *.py)
 	@touch $(formatcheck)
 	$(STEP_BOTTOM)
 
-$(lint): $(install) $(shell find -name *.py)
+$(lint): $(install) $(SOURCE_FILES)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Linting...$(NOCOLOR)"
 	@echo "flake8 `.venv/bin/flake8 --version)`"
@@ -93,7 +93,7 @@ $(lint): $(install) $(shell find -name *.py)
 	@touch $(lint)
 	$(STEP_BOTTOM)
 
-$(typecheck): $(install) $(shell find -name *.py)
+$(typecheck): $(install) $(SOURCE_FILES)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Type checking...$(NOCOLOR)"
 	@.venv/bin/mypy --version
@@ -101,7 +101,7 @@ $(typecheck): $(install) $(shell find -name *.py)
 	@touch $(typecheck)
 	$(STEP_BOTTOM)
 
-$(unit): $(install) $(shell find -name *.py)
+$(unit): $(install) $(SOURCE_FILES)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Running unit and doc tests...$(NOCOLOR)"
 	@.venv/bin/pytest
