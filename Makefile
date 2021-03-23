@@ -23,7 +23,7 @@ test=.venv/.test
 testci=.venv/.testci
 publish=.venv/.publish
 
-all: $(install)
+all: $(hooks) $(install)
 
 # TODO: make step styling less repetitive
 $(venv):
@@ -40,7 +40,7 @@ $(hooks): $(venv)
 	@touch $(hooks)
 	$(STEP_BOTTOM)
 
-$(piptools): $(hooks)  # not a real dep but easier to pretend it is
+$(piptools):
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Installing pip-tools...$(NOCOLOR)"
 	@.venv/bin/python3 -m pip install pip-tools
