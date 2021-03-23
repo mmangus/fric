@@ -1,3 +1,8 @@
+"""
+BitString provides an interface to interact with unsigned integers
+through their bit-string representations, allowing you to slice, append,
+replace, etc. as well as all the usual math you can do with an int.
+"""
 from typing import Collection, Tuple, Union
 
 
@@ -10,18 +15,16 @@ class BitString(int):
     each 4-bit nibble of a byte is used to represent a decimal digit - see
     `BitString.encode_bcd` and `BitString.decode_bcd`.
 
-    >>> BitString(10, fill=8)
-    BitString('00001010')
-    >>> BitString('1010') + BitString('1010') == 20
-    True
-    >>> BitString('1010').join(BitString('1010')) == 170
-    True
+    Examples
+    --------
+    >>> BitString(10)
+    BitString('1010')
     >>> BitString(10)[:2]
     BitString('10')
-    >>> BitString.concat(BitString('1'), BitString.encode_bcd(24, (3, 4)))
-    BitString('10100100')
-    >>> BitString('10100100').decode_bcd((1, 4), (4, 8))
-    24
+    >>> BitString(10, fill=8)
+    BitString('00001010')
+    >>> assert BitString('1010') + BitString('1010') == 10 + 10
+    >>> assert BitString('1').append(BitString('1')) == BitString('11')
     """
 
     bitstring: str  # signal to mypy that this will be added by __new__
@@ -77,6 +80,8 @@ class BitString(int):
         Return a new BitString where `len(value)` bits starting at `offset`
         are replaced by `value`.
 
+        Examples
+        -------
         >>> BitString('1000').replace(1, BitString('101'))
         BitString('1101')
         >>> BitString('1111').replace(2, BitString('0'))
@@ -98,7 +103,10 @@ class BitString(int):
         Parameters
         ----------
         *bitstrings : BitString
+            BitString instances to concatenate
 
+        Example
+        -------
         >>> BitString.concat(BitString('10'), BitString('10'))
         BitString('1010')
         """
@@ -107,7 +115,7 @@ class BitString(int):
         concatenated_string = "".join(map(str, bitstrings))
         return BitString(concatenated_string, fill=len(concatenated_string))
 
-    def join(self, *others: "BitString") -> "BitString":
+    def append(self, *others: "BitString") -> "BitString":
         """
         Join the string representation of other BitStrings onto this one.
 
@@ -116,8 +124,11 @@ class BitString(int):
         Parameters
         ----------
         *others: BitString
+            More BitStrings to append onto this instance
 
-        >>> BitString('10').join(BitString('10'), BitString('01'))
+        Example
+        -------
+        >>> BitString('10').append(BitString('10'), BitString('01'))
         BitString('101001')
         """
         return BitString.concat(self, *others)
@@ -132,6 +143,8 @@ class BitString(int):
         * bounds: Tuple[int, int]
             The boundaries for each digit. Must be castable to a `slice`.
 
+        Examples
+        -------
         >>> BitString('10011001').decode_bcd((0, 4), (4, 8))
         99
         >>> BitString('10011001').decode_bcd((1, 4), (4, 8))
@@ -160,6 +173,8 @@ class BitString(int):
         sizes: Iterable[int, ...], default (4, 4)
             The number of bits to use to encode each digit
 
+        Examples
+        -------
         >>> BitString.encode_bcd(19)
         BitString('00011001')
         >>> BitString.encode_bcd(19, (3, 4))
