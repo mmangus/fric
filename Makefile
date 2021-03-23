@@ -13,7 +13,7 @@ SUCCESS := @echo "$(GREEN)$(FRAME_TOP)\n┋ All tests complete: success! \n$(FRA
 venv=.venv/bin/activate
 install=.venv/.install
 hooks=.venv/.hooks
-piptools=.venv/bin/pip-compile
+piptools=.venv/.piptools
 format=.venv/.format
 lint=.venv/.lint
 formatcheck=.venv/.format-check
@@ -44,6 +44,7 @@ $(piptools): $(venv)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Installing pip-tools...$(NOCOLOR)"
 	@.venv/bin/python3 -m pip install pip-tools
+	@touch $(piptools)
 	$(STEP_BOTTOM)
 
 requirements: requirements.txt $(install)
