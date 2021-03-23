@@ -121,3 +121,4 @@ rtc = RTC()  # sets up I2C communication via SMBus
 print(rtc.time)  # accesses the clock registers and prints a datetime
 rtc.time = datetime.now()  # set the clock registers from a datetime
 ```
+For a more complete example, see [FricoRTC](https://github.com/mmangus/frico-rtc)
