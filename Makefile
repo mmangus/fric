@@ -123,7 +123,7 @@ $(testci): $(formatcheck) $(lint) $(typecheck) $(unit)
 
 test-ci: $(testci)
 
-dist: $(testci)
+dist: $(testci) $(SOURCE_FILES) README.md setup.cfg
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Building package...$(NOCOLOR)"
 	@.venv/bin/python3 -m build
