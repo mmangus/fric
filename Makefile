@@ -13,7 +13,7 @@ SUCCESS := @echo "$(GREEN)$(FRAME_TOP)\n┋ All tests complete: success! \n$(FRA
 venv=.venv/bin/activate
 install=.venv/.install
 hooks=.venv/.hooks
-piptools=.venv/bin/pip-compile
+piptools=.venv/.piptools
 format=.venv/.format
 lint=.venv/.lint
 formatcheck=.venv/.format-check
@@ -40,15 +40,16 @@ $(hooks): $(venv)
 	@touch $(hooks)
 	$(STEP_BOTTOM)
 
-$(piptools):
+$(piptools): $(venv)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Installing pip-tools...$(NOCOLOR)"
 	@.venv/bin/python3 -m pip install pip-tools
+	@touch $(piptools)
 	$(STEP_BOTTOM)
 
 requirements: requirements.txt $(install)
 
-requirements.txt: requirements.in $(piptools)
+requirements.txt: requirements.in $(piptools) setup.cfg
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Compiling pinned dependencies...$(NOCOLOR)"
 	@CUSTOM_COMPILE_COMMAND="make requirements" .venv/bin/pip-compile requirements.in
@@ -122,7 +123,7 @@ $(testci): $(formatcheck) $(lint) $(typecheck) $(unit)
 
 test-ci: $(testci)
 
-dist: $(testci) $(SOURCE_FILES) README.md
+dist: $(testci)
 	$(STEP_TOP)
 	@echo "$(BLUE)┋ Building package...$(NOCOLOR)"
 	@.venv/bin/python3 -m build

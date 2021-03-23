@@ -12,4 +12,7 @@ line-length = 80
 addopts = "--doctest-modules"
 
 [tool.isort]
-multi_line_output = 3  # compatible with black
+# make isort compatible with black
+multi_line_output = 3
+include_trailing_comma = true
+use_parentheses = true
