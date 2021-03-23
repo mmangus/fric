@@ -1,4 +1,5 @@
 # Frico - Framework for Integrated Circuits
+[![PyPI version](https://badge.fury.io/py/frico.svg)](https://badge.fury.io/py/frico)
 
 Frico is a framework for interfacing with integrated circuits. It uses Python's
 data descriptor functionality to present an interface similar to common
