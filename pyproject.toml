@@ -10,3 +10,6 @@ line-length = 80
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules"
+
+[tool.isort]
+multi_line_output = 3  # compatible with black
