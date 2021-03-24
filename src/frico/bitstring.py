@@ -47,7 +47,6 @@ class BitString(int):
             The minimum length of the bitstring (will pad with 0s on the left).
             Note that if you pass in a string, BitString will always maintain
             at least the length of the string you input.
-
         raise_on_overflow : bool, default False
             Whether to raise ValueError if fill is non-zero and the value
             cannot be represented by the number of bits specified by fill
@@ -61,7 +60,7 @@ class BitString(int):
         instance = super().__new__(cls, value)
         bitstring = bin(instance)[2:]
         instance.bitstring = bitstring.zfill(fill)
-        if raise_on_overflow and len(instance.bitstring) > fill:
+        if fill and raise_on_overflow and len(instance.bitstring) > fill:
             raise ValueError(f"Value {value} too large for {fill} bits")
         return instance
 
