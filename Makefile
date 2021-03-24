@@ -125,7 +125,7 @@ test-ci: $(testci)
 
 .PHONY: check-uncommited
 check-uncommited:
-	@git diff --exit-code || (echo "Commit all changes before publishing"; exit 1)
+	@git diff --exit-code || (echo "Commit all changes before packaging"; exit 1)
 
 dist: $(testci) $(SOURCE_FILES) README.md setup.cfg check-uncommited
 	$(STEP_TOP)
