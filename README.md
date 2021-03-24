@@ -114,6 +114,7 @@ class Time(DatetimeRegisterBlock):
 class RTC(I2CDevice):
     I2C_ADDRESS = 0x68  # the I2C device address
     I2C_READ_LEN = 0x06  # number of bytes readable from the device
+    I2C_READ_START = 0x00
     time = Time()
 
 
