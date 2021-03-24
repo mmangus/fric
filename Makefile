@@ -123,8 +123,14 @@ $(testci): $(formatcheck) $(lint) $(typecheck) $(unit)
 
 test-ci: $(testci)
 
-dist: $(testci) $(SOURCE_FILES) README.md setup.cfg
+.PHONY: check-uncommited
+check-uncommited:
+	@git diff --exit-code || (echo "Commit all changes before publishing"; exit 1)
+
+dist: $(testci) $(SOURCE_FILES) README.md setup.cfg check-uncommited
 	$(STEP_TOP)
+	@echo "$(BLUE)┋ Removing previous package build...$(NOCOLOR)"
+	@rm -rf build dist src/frico.egg-info
 	@echo "$(BLUE)┋ Building package...$(NOCOLOR)"
 	@.venv/bin/python3 -m build
 	$(STEP_BOTTOM)
@@ -133,7 +139,6 @@ package: dist
 
 $(publish): dist
 	$(STEP_TOP)
-	@git diff --exit-code || (echo "Commit all changes before publishing"; exit 1)
 	@echo "$(BLUE)┋ Publishing...$(NOCOLOR)"
 	@python3 -m twine upload dist/*
 	@touch $(publish)
@@ -148,10 +153,7 @@ clean:
 	@echo "Removing .venv..."
 	@rm -rf .venv
 	@echo "Removing packaging directories..."
-	@rm -rf build
-	@rm -rf dist
-	@rm -rf src/frico.egg-info
+	@rm -rf build dist src/frico.egg-info
 	@echo "Removing test cache..."
-	@rm -rf .mypy_cache
-	@rm -rf .pytest_cache
+	@rm -rf .mypy_cache .pytest_cache
 	$(STEP_BOTTOM)
